@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz : Démarche Marketing & Définition des Marchés</title>
+    <style>
+        body {
+            font-family: 'Mayan', sans-serif;
+            margin: 0;
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #333;
+            text-align: center;
+        }
+        .quiz-container, .summary {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-image: url('images/back.jpg.webp');
+            background-size: cover;
+            background-position: center;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #000;
+        }
+        .choices {
+            list-style: none;
+            padding: 0;
+            text-align: left;
+            margin-left: 20%;
+        }
+        .choices li {
+            margin: 8px 0;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #FF0000;
+            color: white;
+            border-radius: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #CC0000;
+        }
+        .summary {
+            display: none;
+        }
+        .summary ul {
+            list-style: none;
+            padding: 0;
+        }
+        .summary li {
+            text-align: left;
+            margin-left: 20%;
+            margin-bottom: 10px;
+        }
+        .correct {
+            color: green;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: red;
+            font-weight: bold;
+        }
+        .score {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        @media (max-width: 768px) {
+            .quiz-container, .summary {
+                max-width: 90%;
+                margin: 20px auto;
+                padding: 15px;
+                border-radius: 10px;
+            }
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+        }
+        @media (max-width: 480px) {
+            .quiz-container, .summary {
+                padding: 10px;
+                margin: 10px;
+                border-radius: 10px;
+            }
+            .question {
+                font-size: 16px;
+            }
+            button {
+                font-size: 12px;
+                padding: 6px 12px;
+                border-radius: 10px;
+            }
+        }
+        @media (min-width: 1024px) {
+            .quiz-container, .summary {
+                max-width: 800px;
+                padding: 30px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="quiz-container" id="quiz-container">
+    <h2>Quiz : Immobilisations et Amortissements</h2>
+    <div id="question-container">
+        <!-- Les questions seront affichées ici dynamiquement -->
+    </div>
+    <button id="next-button" onclick="nextQuestion()">Suivant</button>
+</div>
+
+<div class="summary" id="summary">
+    <h3>Récapitulatif</h3>
+    <ul id="summary-list">
+        <!-- Le récapitulatif des réponses sera affiché ici -->
+    </ul>
+    <div class="score" id="score"></div>
+    <button onclick="restartQuiz()">Recommencer</button>
+</div>
+
+<script>
+    const quizData = [
+        { question: "Qu'est-ce qu'un actif immobilisé dans une entreprise ?", choices: ["Un actif utilisé pour des transactions quotidiennes", "Un actif utilisé et détenu pendant plus d'un an", "Un actif consommé en moins d'un an", "Un actif non essentiel à l'entreprise"], correct: 1 },
+        { question: "Quelle est la différence entre l'amortissement et la dépréciation ?", choices: ["L'amortissement concerne uniquement les terrains, la dépréciation concerne les machines", "L'amortissement est planifié, la dépréciation est une perte non anticipée", "L'amortissement est réversible, la dépréciation est irréversible", "La dépréciation est planifiée, l'amortissement est imprévu"], correct: 1 },
+        { question: "Qu'est-ce que la valeur résiduelle d'un actif ?", choices: ["Le coût total d'acquisition de l'actif", "La valeur à laquelle l'actif peut être revendu à la fin de sa durée de vie", "La valeur après amortissement total", "La valeur comptable nette de l'actif"], correct: 1 },
+        { question: "Quelle méthode d'amortissement répartit uniformément la charge sur la durée de vie de l'actif ?", choices: ["La méthode linéaire", "La méthode dégressive", "La méthode des unités de production", "La méthode des coûts moyens pondérés"], correct: 0 },
+        { question: "Que signifie le terme 'immobilisation incorporelle' ?", choices: ["Un actif physique comme une machine", "Un actif non physique comme un brevet ou une licence", "Un actif financier comme des actions", "Un actif non amortissable"], correct: 1 },
+        { question: "Comment l'entreprise comptabilise-t-elle les immobilisations produites par elle-même ?", choices: ["Au coût de marché", "Au coût de production", "Au coût de vente estimé", "Au coût amorti"], correct: 1 },
+        { question: "Qu'est-ce que l'annuité d'amortissement en méthode linéaire ?", choices: ["La valeur résiduelle divisée par la durée de vie de l'actif", "Le coût d'acquisition divisé par la durée de vie de l'actif", "La perte de valeur nette après chaque année", "Le montant à amortir chaque année multiplié par la durée de vie de l'actif"], correct: 1 },
+        { question: "Quelle méthode d'amortissement est utilisée pour des biens dont l'utilisation varie en fonction du niveau de production ?", choices: ["La méthode dégressive", "La méthode linéaire", "La méthode des unités de production", "La méthode des coûts constants"], correct: 2 },
+        { question: "Quelles dépenses ne sont pas comptabilisées dans la valeur d'acquisition d'une immobilisation corporelle ?", choices: ["Les coûts de transport", "Les coûts d'installation", "Les frais de maintenance réguliers", "Les coûts d'achat initiaux"], correct: 2 },
+        { question: "Qu'est-ce que le modèle de réévaluation sous les normes IFRS ?", choices: ["Un modèle qui permet de réévaluer les immobilisations à la hausse ou à la baisse", "Un modèle où les actifs sont amortis sur leur coût initial", "Un modèle qui interdit toute réévaluation des actifs", "Un modèle qui ne s'applique qu'aux actifs incorporels"], correct: 0 },
+        { question: "Quand doit-on comptabiliser une dépréciation ?", choices: ["Lorsque la valeur comptable nette d'un actif est supérieure à sa valeur recouvrable", "Lorsque la durée de vie de l'actif est expirée", "Lorsque l'actif a été utilisé à pleine capacité", "Lorsque l'actif est remplacé par un nouveau"], correct: 0 },
+        { question: "Quelle méthode d'amortissement permet de réduire plus fortement la valeur d'un actif dans les premières années d'utilisation ?", choices: ["La méthode linéaire", "La méthode des unités de production", "La méthode dégressive", "La méthode constante"], correct: 2 },
+        { question: "Quels types de coûts de développement peuvent être capitalisés ?", choices: ["Tous les coûts de développement", "Les coûts de recherche", "Les coûts répondant à des critères de faisabilité et de rentabilité future", "Aucun coût de développement ne peut être capitalisé"], correct: 2 },
+        { question: "Comment les coûts de recherche sont-ils traités en comptabilité ?", choices: ["Ils sont toujours capitalisés", "Ils sont passés en charges car ils concernent des activités sans garantie de résultat", "Ils sont amortis sur plusieurs années", "Ils sont capitalisés seulement en fin de projet"], correct: 1 },
+        { question: "Que signifie la 'capitalisation' d'un actif incorporel ?", choices: ["Le fait d'amortir l'actif immédiatement", "L'enregistrement du coût comme un actif pour le répartir sur plusieurs années", "L'enregistrement du coût comme une charge unique", "L'enregistrement du coût après la vente de l'actif"], correct: 1 }
+    ];
+
+    let currentQuestionIndex = 0;
+    let selectedAnswers = [];
+
+    function loadQuestion() {
+        const container = document.getElementById('question-container');
+        container.innerHTML = '';
+
+        const questionData = quizData[currentQuestionIndex];
+        const questionElem = document.createElement('div');
+        questionElem.className = 'question';
+        questionElem.textContent = questionData.question;
+
+        const choicesElem = document.createElement('ul');
+        choicesElem.className = 'choices';
+
+        questionData.choices.forEach((choice, index) => {
+            const choiceElem = document.createElement('li');
+            const choiceInput = document.createElement('input');
+            choiceInput.type = 'radio';
+            choiceInput.name = 'choice';
+            choiceInput.value = index;
+            choiceInput.id = `choice${index}`;
+            
+            const choiceLabel = document.createElement('label');
+            choiceLabel.htmlFor = `choice${index}`;
+            choiceLabel.textContent = choice;
+
+            choiceElem.appendChild(choiceInput);
+            choiceElem.appendChild(choiceLabel);
+            choicesElem.appendChild(choiceElem);
+        });
+
+        container.appendChild(questionElem);
+        container.appendChild(choicesElem);
+    }
+
+    function nextQuestion() {
+        const selectedChoice = document.querySelector('input[name="choice"]:checked');
+        if (!selectedChoice) {
+            alert("Veuillez sélectionner une réponse !");
+            return;
+        }
+
+        selectedAnswers.push(parseInt(selectedChoice.value));
+        currentQuestionIndex++;
+
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showSummary();
+        }
+    }
+
+    function showSummary() {
+        document.getElementById('quiz-container').style.display = 'none';
+        const summary = document.getElementById('summary');
+        summary.style.display = 'block';
+
+        const summaryList = document.getElementById('summary-list');
+        summaryList.innerHTML = '';
+
+        let correctAnswers = 0;
+
+        quizData.forEach((q, index) => {
+            const summaryItem = document.createElement('li');
+            summaryItem.innerHTML = `
+                <strong>${q.question}</strong><br>
+                <div style="text-align: left; margin-left: 20%;">
+                    Votre réponse: ${q.choices[selectedAnswers[index]]} - 
+                    ${selectedAnswers[index] === q.correct ? '<span class="correct">Correct</span>' : '<span class="incorrect">Incorrect</span>'}<br>
+                    Bonne réponse: ${q.choices[q.correct]}
+                </div>
+            `;
+            summaryList.appendChild(summaryItem);
+            if (selectedAnswers[index] === q.correct) {
+                correctAnswers++;
+            }
+        });
+
+        document.getElementById('score').textContent = `Score: ${correctAnswers} / ${quizData.length}`;
+    }
+
+    function restartQuiz() {
+        currentQuestionIndex = 0;
+        selectedAnswers = [];
+        document.getElementById('summary').style.display = 'none';
+        document.getElementById('quiz-container').style.display = 'block';
+        loadQuestion();
+    }
+
+    loadQuestion();
+</script>
+
+</body>
+
+</html>
